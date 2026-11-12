@@ -21,7 +21,7 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; color-scheme: dark; }
 body {
   margin: 0;
   background: var(--bg);
@@ -302,9 +302,15 @@ img { max-width: 100%; display: block; }
 .search-field i { position: absolute; right: 9px; top: 6px; color: var(--muted-2); font-style: normal; font-size: 16px; pointer-events: none; }
 select {
   height: 34px; padding: 0 28px 0 10px; border: 1px solid var(--line); border-radius: 0;
-  background: var(--panel); color: var(--muted); font-size: 10.5px; outline: 0;
+  background: var(--panel); color: var(--ink); font-size: 10.5px; outline: 0;
+  color-scheme: dark;
 }
 select:focus { border-color: var(--red); }
+select option {
+  background-color: #1b1713;
+  color: #f2eadc;
+}
+select option:disabled { color: #766c60; }
 .company-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
 .company-card {
   position: relative; display: flex; flex-direction: column; min-height: 272px; padding: 19px;

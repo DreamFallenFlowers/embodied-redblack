@@ -473,7 +473,7 @@
           <div class="form-section">
             <div class="form-section-head"><span>03</span><h2>理由</h2></div>
             <label class="field"><span>具体理由 <em>*</em></span>
-              <textarea name="reason" rows="7" minlength="36" maxlength="1600" required placeholder="至少写 36 个字。可以写：你在什么团队、做什么、哪些地方好、哪些地方让你不舒服、你会如何建议下一个人判断。"></textarea>
+              <textarea name="reason" rows="7" required placeholder="可以写：你在什么团队、做什么、哪些地方好、哪些地方让你不舒服、你会如何建议下一个人判断。"></textarea>
             </label>
             <p class="form-hint">避免只写「好」「坑」「快跑」。没有理由的评价不会被收录。</p>
           </div>
