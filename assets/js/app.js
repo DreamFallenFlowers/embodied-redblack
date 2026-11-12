@@ -406,6 +406,19 @@
 
   /* -------------------------------------------------------------- submit */
 
+  function customSelectMarkup(name, options, selected) {
+    const current = options.find(option => option[0] === selected) || options[0];
+    return `<div class="custom-select" data-custom-select>
+      <button class="custom-select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+        <span>${esc(current[1])}</span><i aria-hidden="true">⌄</i>
+      </button>
+      <input type="hidden" name="${esc(name)}" value="${esc(current[0])}">
+      <div class="custom-select-menu" role="listbox" hidden>
+        ${options.map(([value, label]) => `<button class="custom-option" type="button" role="option" data-value="${esc(value)}" aria-selected="${value === current[0] ? "true" : "false"}">${esc(label)}</button>`).join("")}
+      </div>
+    </div>`;
+  }
+
   function renderSubmit() {
     const selectedId = new URLSearchParams((window.location.hash.split("?")[1] || "")).get("company") || "";
     const selected = companyById.get(selectedId);
@@ -428,37 +441,37 @@
             </div>
             <p class="form-hint">公司名可以直接填写；输入时会显示公司库中的建议。</p>
             <div class="field-grid field-grid--three">
-              <label class="field"><span>评价类型 <em>*</em></span>
-                <select name="type" required>
-                  <option value="good">好评</option>
-                  <option value="neutral" selected>中立</option>
-                  <option value="bad">差评</option>
-                </select>
-              </label>
+              <div class="field"><span>评价类型 <em>*</em></span>
+                ${customSelectMarkup("type", [
+                  ["good", "好评"],
+                  ["neutral", "中立"],
+                  ["bad", "差评"]
+                ], "neutral")}
+              </div>
               <label class="field"><span>岗位 / 职能</span><input type="text" name="role" maxlength="60" placeholder="例如：算法工程师"></label>
-              <label class="field"><span>任期</span>
-                <select name="tenure">
-                  <option value="">未填写</option>
-                  <option>3–6 个月</option>
-                  <option>6–12 个月</option>
-                  <option>1–2 年</option>
-                  <option>2–4 年</option>
-                  <option>4 年以上</option>
-                  <option>仅面试</option>
-                </select>
-              </label>
+              <div class="field"><span>任期</span>
+                ${customSelectMarkup("tenure", [
+                  ["", "未填写"],
+                  ["3–6 个月", "3–6 个月"],
+                  ["6–12 个月", "6–12 个月"],
+                  ["1–2 年", "1–2 年"],
+                  ["2–4 年", "2–4 年"],
+                  ["4 年以上", "4 年以上"],
+                  ["仅面试", "仅面试"]
+                ], "")}
+              </div>
             </div>
             <div class="field-grid field-grid--two">
               <label class="field"><span>城市</span><input type="text" name="location" maxlength="40" placeholder="例如：上海"></label>
-              <label class="field"><span>身份</span>
-                <select name="relation">
-                  <option value="不愿透露">不愿透露</option>
-                  <option>现任员工</option>
-                  <option>前员工</option>
-                  <option>面试候选人</option>
-                  <option>合作方 / 其他</option>
-                </select>
-              </label>
+              <div class="field"><span>身份</span>
+                ${customSelectMarkup("relation", [
+                  ["不愿透露", "不愿透露"],
+                  ["现任员工", "现任员工"],
+                  ["前员工", "前员工"],
+                  ["面试候选人", "面试候选人"],
+                  ["合作方 / 其他", "合作方 / 其他"]
+                ], "不愿透露")}
+              </div>
             </div>
           </div>
 
@@ -540,9 +553,53 @@ ${value("link") || "（未填写）"}
 *由具身红黑榜提交表单生成。提交者确认内容为个人真实经历，不含人身攻击、隐私或未公开信息。*`;
   }
 
+  function closeCustomSelects(except = null) {
+    document.querySelectorAll("[data-custom-select]").forEach(select => {
+      if (select === except) return;
+      select.querySelector(".custom-select-trigger")?.setAttribute("aria-expanded", "false");
+      const menu = select.querySelector(".custom-select-menu");
+      if (menu) menu.hidden = true;
+    });
+  }
+
+  function setupCustomSelects(root) {
+    root.querySelectorAll("[data-custom-select]").forEach(select => {
+      const trigger = select.querySelector(".custom-select-trigger");
+      const menu = select.querySelector(".custom-select-menu");
+      const hidden = select.querySelector('input[type="hidden"]');
+      if (!trigger || !menu || !hidden) return;
+      trigger.addEventListener("click", event => {
+        event.stopPropagation();
+        const willOpen = menu.hidden;
+        closeCustomSelects(select);
+        menu.hidden = !willOpen;
+        trigger.setAttribute("aria-expanded", String(willOpen));
+      });
+      menu.querySelectorAll("[data-value]").forEach(option => {
+        option.addEventListener("click", event => {
+          event.stopPropagation();
+          hidden.value = option.dataset.value;
+          trigger.querySelector("span").textContent = option.textContent;
+          menu.querySelectorAll("[data-value]").forEach(item => item.setAttribute("aria-selected", String(item === option)));
+          menu.hidden = true;
+          trigger.setAttribute("aria-expanded", "false");
+          trigger.focus();
+        });
+      });
+      select.addEventListener("keydown", event => {
+        if (event.key === "Escape") {
+          menu.hidden = true;
+          trigger.setAttribute("aria-expanded", "false");
+          trigger.focus();
+        }
+      });
+    });
+  }
+
   function setupSubmit() {
     const form = document.getElementById("review-form");
     if (!form) return;
+    setupCustomSelects(form);
     form.querySelector("[data-copy-review]")?.addEventListener("click", () => {
       if (!form.reportValidity()) return;
       copyText(buildReviewDraft(form), "评价草稿已复制");
@@ -613,6 +670,7 @@ ${value("link") || "（未填写）"}
     });
     document.querySelectorAll("#mobile-menu a").forEach(link => link.addEventListener("click", closeMenu));
     document.querySelector("[data-year]")?.replaceChildren(document.createTextNode(new Date().getFullYear()));
+    document.addEventListener("click", () => closeCustomSelects());
   }
 
   function render() {
