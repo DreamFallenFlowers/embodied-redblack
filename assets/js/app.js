@@ -2,22 +2,38 @@
   "use strict";
 
   const CFG = window.RB_CONFIG || {};
-  const { companies = [], reviews = [] } = window.RB_DATA || {};
+  const staticCompanies = (window.RB_DATA && window.RB_DATA.companies) || [];
+  const staticReviews = (window.RB_DATA && window.RB_DATA.reviews) || [];
   const DEMO_MODE = CFG.demoMode !== false;
   const REPO = (CFG.repo || "").replace(/^\/|\/$/g, "");
   const REPO_URL = REPO ? `https://github.com/${REPO}` : "";
   const BRANCH = CFG.branch || "main";
+  const SUPABASE = CFG.supabase || {};
+  const SUPABASE_URL = String(SUPABASE.url || "").replace(/\/$/, "");
+  const SUPABASE_KEY = String(SUPABASE.anonKey || "");
+  const SUPABASE_TABLE = String(SUPABASE.table || "reviews");
+  const SUPABASE_ENABLED = Boolean(SUPABASE_URL && SUPABASE_KEY);
   const main = document.getElementById("main");
   const toastRegion = document.getElementById("toast-region");
   let toastTimer = null;
+  let companies = staticCompanies.slice();
+  let reviews = staticReviews.slice();
+  let visibleReviews = [];
+  let companyById = new Map();
+  let reviewsByCompany = new Map();
+  let supabaseReady = false;
 
-  const visibleReviews = reviews.filter(review => DEMO_MODE || !review.demo);
-  const companyById = new Map(companies.map(company => [company.id, company]));
-  const reviewsByCompany = new Map();
-  visibleReviews.forEach(review => {
-    if (!reviewsByCompany.has(review.companyId)) reviewsByCompany.set(review.companyId, []);
-    reviewsByCompany.get(review.companyId).push(review);
-  });
+  function rebuildIndexes() {
+    visibleReviews = reviews.filter(review => DEMO_MODE || !review.demo);
+    companyById = new Map(companies.map(company => [company.id, company]));
+    reviewsByCompany = new Map();
+    visibleReviews.forEach(review => {
+      if (!reviewsByCompany.has(review.companyId)) reviewsByCompany.set(review.companyId, []);
+      reviewsByCompany.get(review.companyId).push(review);
+    });
+  }
+
+  rebuildIndexes();
 
   const esc = value => String(value ?? "").replace(/[&<>"']/g, char => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
@@ -117,6 +133,110 @@
 
   function allRealCompanies() {
     return companies.filter(company => !company.demo);
+  }
+
+  function normalizeCompanyName(value) {
+    return String(value || "").toLowerCase().replace(/\s+/g, "").replace(/[·（）()，,。.]/g, "");
+  }
+
+  function remoteCompanyId(name) {
+    let hash = 0;
+    for (const char of String(name)) hash = (hash * 31 + char.codePointAt(0)) >>> 0;
+    return `remote-${hash.toString(36)}`;
+  }
+
+  function supabaseHeaders(extra = {}) {
+    const headers = { apikey: SUPABASE_KEY };
+    if (SUPABASE_KEY.startsWith("eyJ")) headers.Authorization = `Bearer ${SUPABASE_KEY}`;
+    return { ...headers, ...extra };
+  }
+
+  async function loadSupabaseReviews() {
+    if (!SUPABASE_ENABLED) {
+      supabaseReady = false;
+      return false;
+    }
+    try {
+      const response = await fetch(
+        `${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?select=*&order=created_at.desc`,
+        { headers: supabaseHeaders({ Accept: "application/json" }) }
+      );
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const rows = await response.json();
+      const byName = new Map(staticCompanies.map(company => [normalizeCompanyName(company.name), company]));
+      const remoteCompanies = [];
+      const remoteReviews = [];
+      rows.forEach(row => {
+        const companyName = String(row.company_name || "").trim();
+        const type = ["good", "neutral", "bad"].includes(row.type) ? row.type : null;
+        const salary = Number(row.salary);
+        const atmosphere = Number(row.atmosphere);
+        const growth = Number(row.growth);
+        if (!companyName || !type || ![salary, atmosphere, growth].every(value => value >= 1 && value <= 5)) return;
+        const normalizedName = normalizeCompanyName(companyName);
+        let company = byName.get(normalizedName);
+        if (!company) {
+          company = {
+            id: remoteCompanyId(companyName),
+            name: companyName,
+            en: "",
+            sector: "其他",
+            city: row.location && row.location !== "未填写" ? row.location : "未标注",
+            stage: "",
+            tags: [],
+            website: "",
+            description: "由社区评价自动生成的公司条目。",
+            demo: false
+          };
+          byName.set(normalizedName, company);
+          remoteCompanies.push(company);
+        }
+        remoteReviews.push({
+          id: `sb-${row.id}`,
+          companyId: company.id,
+          type,
+          salary,
+          atmosphere,
+          growth,
+          reason: String(row.reason || ""),
+          role: row.role || "未填写",
+          tenure: row.tenure || "未填写",
+          location: row.location || "未填写",
+          date: String(row.created_at || "").slice(0, 10),
+          author: row.author || "匿名",
+          source: "supabase"
+        });
+      });
+      companies = staticCompanies.concat(remoteCompanies);
+      reviews = staticReviews.concat(remoteReviews);
+      rebuildIndexes();
+      supabaseReady = true;
+      return true;
+    } catch (error) {
+      console.warn("Supabase reviews unavailable:", error);
+      companies = staticCompanies.slice();
+      reviews = staticReviews.slice();
+      rebuildIndexes();
+      supabaseReady = false;
+      return false;
+    }
+  }
+
+  function reviewPayload(form) {
+    const data = new FormData(form);
+    const value = key => String(data.get(key) || "").trim();
+    return {
+      company_name: value("companyName"),
+      type: value("type"),
+      salary: Number(value("salary")),
+      atmosphere: Number(value("atmosphere")),
+      growth: Number(value("growth")),
+      reason: value("reason"),
+      role: value("role") || null,
+      tenure: value("tenure") || null,
+      location: value("location") || null,
+      author: value("author") || "匿名"
+    };
   }
 
   function demoBanner() {
@@ -424,6 +544,7 @@
     const selected = companyById.get(selectedId);
     const selectedName = selected ? selected.name : "";
     const real = allRealCompanies();
+    const directPublish = SUPABASE_ENABLED && supabaseReady;
     return `<div class="view submit-view">
       <section class="page-head wrap">
         <p class="eyebrow"><span class="eyebrow-dot"></span>ANONYMOUS REVIEW / SUBMIT</p>
@@ -493,17 +614,20 @@
 
           <div class="form-section">
             <div class="form-section-head"><span>04</span><h2>署名与声明</h2></div>
-            <div class="field-grid field-grid--two">
-              <label class="field"><span>展示名称</span><input type="text" name="author" maxlength="40" placeholder="可留空，默认匿名"></label>
-              <label class="field"><span>补充链接</span><input type="url" name="link" placeholder="可选：招聘页 / 项目页"></label>
+            <div class="field-grid">
+              <label class="field field--wide"><span>展示名称</span><input type="text" name="author" maxlength="40" placeholder="可留空，默认匿名"></label>
             </div>
-            <label class="check-field"><input type="checkbox" name="consent" required><span>我确认内容是自己的真实经历，不包含人身攻击、隐私、未公开信息或商业秘密；同意自动公开展示，并允许后续更正或撤下。</span></label>
-            <p class="form-disclaimer">提交会生成一个公开 GitHub Issue，用于留痕与自动发布。Issue 打开后会自动写入榜单；编辑会事后抽查，违规内容可被撤下。请不要填写真实姓名、联系方式或可识别他人的信息。</p>
+            <label class="check-field"><input type="checkbox" name="consent" required><span>我确认内容是自己的真实经历，不包含人身攻击、隐私、未公开信息或商业秘密；同意公开展示，并允许后续更正或撤下。</span></label>
+            <p class="form-disclaimer">${directPublish
+              ? "提交后会直接写入公开榜单，不需要登录。请不要填写真实姓名、联系方式或可识别他人的信息。编辑会事后抽查，违规内容可被撤下。"
+              : "提交会生成一个公开 GitHub Issue，用于留痕与自动发布。请不要填写真实姓名、联系方式或可识别他人的信息。"}</p>
             <div class="form-actions">
               <button class="button button--ghost" type="button" data-copy-review>复制草稿</button>
-              <button class="button button--red" type="submit">提交到 GitHub <span>↗</span></button>
+              <button class="button button--red" type="submit">${directPublish ? "发布评价" : "提交到 GitHub"} <span>↗</span></button>
             </div>
-            <p class="form-status" id="review-status">${REPO ? "提交后会打开 GitHub Issue，自动发布到榜单。" : "当前未配置仓库，提交会复制草稿。"}</p>
+            <p class="form-status" id="review-status">${directPublish
+              ? "提交后会直接发布到公开榜单，无需登录。"
+              : SUPABASE_ENABLED ? "匿名后端暂未就绪，暂时改用 GitHub Issue。" : REPO ? "提交后会打开 GitHub Issue，自动发布到榜单。" : "当前未配置后端，提交会复制草稿。"}</p>
           </div>
         </form>
       </section>
@@ -545,9 +669,6 @@ ${value("relation")}
 
 ### 展示名称
 ${value("author") || "匿名"}
-
-### 补充链接
-${value("link") || "（未填写）"}
 
 ---
 *由具身红黑榜提交表单生成。提交者确认内容为个人真实经历，不含人身攻击、隐私或未公开信息。*`;
@@ -596,6 +717,42 @@ ${value("link") || "（未填写）"}
     });
   }
 
+  async function submitToSupabase(form) {
+    const status = document.getElementById("review-status");
+    const button = form.querySelector('button[type="submit"]');
+    const payload = reviewPayload(form);
+    if (button) button.disabled = true;
+    if (status) status.textContent = "正在发布…";
+    try {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}`, {
+        method: "POST",
+        headers: supabaseHeaders({
+          "Content-Type": "application/json",
+          Prefer: "return=minimal"
+        }),
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) {
+        let detail = "";
+        try {
+          const errorBody = await response.json();
+          detail = errorBody.message || errorBody.hint || "";
+        } catch (_) {}
+        throw new Error(detail || `HTTP ${response.status}`);
+      }
+      await loadSupabaseReviews();
+      const company = companies.find(item => normalizeCompanyName(item.name) === normalizeCompanyName(payload.company_name));
+      if (status) status.textContent = "评价已发布。";
+      showToast("评价已发布");
+      window.location.hash = company ? `#/company/${encodeURIComponent(company.id)}` : "#/";
+    } catch (error) {
+      if (status) status.textContent = `发布失败：${error.message}`;
+      showToast("评价发布失败，请稍后重试");
+    } finally {
+      if (button) button.disabled = false;
+    }
+  }
+
   function setupSubmit() {
     const form = document.getElementById("review-form");
     if (!form) return;
@@ -604,9 +761,13 @@ ${value("link") || "（未填写）"}
       if (!form.reportValidity()) return;
       copyText(buildReviewDraft(form), "评价草稿已复制");
     });
-    form.addEventListener("submit", event => {
+    form.addEventListener("submit", async event => {
       event.preventDefault();
       if (!form.reportValidity()) return;
+      if (SUPABASE_ENABLED && supabaseReady) {
+        await submitToSupabase(form);
+        return;
+      }
       const draft = buildReviewDraft(form);
       const companyName = form.querySelector('[name="companyName"]').value.trim() || "新公司";
       const type = typeMeta(form.querySelector('[name="type"]').value).label;
@@ -803,6 +964,11 @@ ${value("link") || "（未填写）"}
     render();
   });
 
-  bindShared();
-  render();
+  async function init() {
+    await loadSupabaseReviews();
+    bindShared();
+    render();
+  }
+
+  init();
 })();
