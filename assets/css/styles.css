@@ -118,6 +118,12 @@ img { max-width: 100%; display: block; }
   padding-top: clamp(58px, 8vw, 112px); padding-bottom: clamp(64px, 9vw, 126px);
 }
 .hero-copy { max-width: 690px; }
+.hero--simple {
+  display: block;
+  padding-top: clamp(54px, 7vw, 92px);
+  padding-bottom: clamp(48px, 6vw, 76px);
+}
+.hero--simple .hero-copy { max-width: 860px; }
 .hero h1 {
   margin: 23px 0 0; font-family: var(--serif); font-size: clamp(86px, 11.3vw, 158px);
   line-height: .8; letter-spacing: -.075em; font-weight: 500;
@@ -196,6 +202,21 @@ img { max-width: 100%; display: block; }
 
 /* ------------------------------------------------------------- section */
 .section { padding-top: clamp(64px, 8vw, 112px); padding-bottom: 0; }
+.list-section {
+  padding-top: clamp(48px, 6vw, 78px);
+  padding-bottom: clamp(48px, 6vw, 78px);
+  border-top: 1px solid var(--line);
+}
+.list-section--red { border-top: 2px solid var(--red); }
+.list-section--black { border-top: 2px solid var(--ink); }
+.list-section .section-head h2 { font-size: clamp(58px, 8vw, 104px); }
+.list-section .section-head h2 span { color: var(--red); }
+.list-section .section-aside { max-width: 300px; padding-bottom: 7px; }
+.list-section .company-list {
+  margin-top: 28px;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+}
+.list-section .empty-state { margin-top: 28px; }
 .section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 38px; }
 .section-head .eyebrow { margin-bottom: 15px; }
 .section-title, .section-head h2 {
@@ -504,6 +525,7 @@ select:focus { border-color: var(--red); }
 @media (max-width: 1050px) {
   .wrap { width: min(100% - 42px, var(--wrap)); }
   .hero { grid-template-columns: minmax(0, 1fr); gap: 36px; padding-top: 55px; padding-bottom: 70px; }
+  .hero--simple { padding-top: 48px; padding-bottom: 55px; }
   .hero-copy { max-width: 730px; }
   .hero-board { max-width: 620px; }
   .company-list, .review-list { grid-template-columns: 1fr 1fr; }
@@ -539,6 +561,7 @@ select:focus { border-color: var(--red); }
   .board-controls .search-field { flex: 1; }
   .board-controls .search-field input { width: 100%; }
   .company-list { grid-template-columns: 1fr; }
+  .list-section .company-list { grid-template-columns: 1fr; }
   .company-card { min-height: 250px; }
   .latest-grid { grid-template-columns: 1fr; }
   .method-band-inner { grid-template-columns: 1fr; gap: 26px; }

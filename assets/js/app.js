@@ -132,12 +132,15 @@
 
   function renderHome() {
     const ranked = companies.filter(company => companyStats(company.id).count > 0);
-    const redCount = ranked.filter(company => companyStats(company.id).verdict === "red").length;
-    const blackCount = ranked.filter(company => companyStats(company.id).verdict === "black").length;
-    const overall = average(visibleReviews.map(review => (review.salary + review.atmosphere + review.growth) / 3));
+    const redCompanies = ranked
+      .filter(company => companyStats(company.id).verdict === "red")
+      .sort((a, b) => companyStats(b.id).overall - companyStats(a.id).overall);
+    const blackCompanies = ranked
+      .filter(company => companyStats(company.id).verdict === "black")
+      .sort((a, b) => companyStats(a.id).overall - companyStats(b.id).overall);
     return `
       <div class="view home-view">
-        <section class="hero wrap">
+        <section class="hero hero--simple wrap">
           <div class="hero-copy">
             <p class="eyebrow"><span class="eyebrow-dot"></span>ANONYMOUS EXPERIENCE / PUBLIC REASONING</p>
             <h1>具身<br><em>红黑榜</em></h1>
@@ -147,95 +150,34 @@
             </div>
             <p class="hero-note">匿名投稿 · 社区审核 · 不收录人身攻击与未公开信息</p>
           </div>
-          <div class="hero-board" aria-label="榜单概览">
-            <div class="board-top"><span>LIVE BOARD / 2026</span><span class="board-live"><i></i>UPDATED</span></div>
-            <div class="board-numbers">
-              <div><strong>${pad(companies.length)}</strong><span>收录公司</span></div>
-              <div><strong>${pad(visibleReviews.length)}</strong><span>有效评价</span></div>
-              <div><strong>${scoreText(overall)}</strong><span>综合均分</span></div>
-            </div>
-            <div class="board-split">
-              <a class="board-half board-half--red" href="#/" data-tab-link="red">
-                <span>RED LIST</span><strong>${pad(redCount)}</strong><small>综合 ≥ 4.0</small>
-              </a>
-              <a class="board-half board-half--black" href="#/" data-tab-link="black">
-                <span>BLACK LIST</span><strong>${pad(blackCount)}</strong><small>综合 ≤ 2.5</small>
-              </a>
-            </div>
-            <div class="board-foot"><span>三个维度等权平均</span><span>样本不足会标记为「观察中」</span></div>
-          </div>
         </section>
 
         ${demoBanner()}
 
-        <section class="section board-section wrap" id="board">
+        <section class="section list-section list-section--red wrap" id="red">
           <div class="section-head">
             <div>
-              <p class="eyebrow">01 / THE BOARD</p>
-              <h2>先看分数，<br><em>再看理由。</em></h2>
+              <p class="eyebrow">RED LIST / ${pad(redCompanies.length)} COMPANIES</p>
+              <h2>红榜<span>。</span></h2>
             </div>
-            <div class="section-aside">
-              <p>榜单只汇总公开投稿的个人经验，不代表公司事实。每张卡片都可以进入公司页，查看好评与差评的原始理由。</p>
-              <a class="text-link" href="#/companies">浏览全部公司 <span>↗</span></a>
-            </div>
+            <p class="section-aside">综合评分 ≥ 4.0 的公司。点开卡片，查看完整好评与差评原文。</p>
           </div>
-
-          <div class="board-tools">
-            <div class="tabs" role="tablist" aria-label="榜单分类">
-              ${tabButton("all", "全部", ranked.length)}
-              ${tabButton("red", "红榜", redCount)}
-              ${tabButton("black", "黑榜", blackCount)}
-              ${tabButton("watch", "观察中", ranked.filter(company => companyStats(company.id).verdict === "watch").length)}
-              ${tabButton("pending", "待评价", companies.length - ranked.length)}
-            </div>
-            <div class="board-controls">
-              <label class="search-field"><span class="sr-only">搜索公司</span><input id="company-search" type="search" placeholder="搜索公司、城市或方向" autocomplete="off"><i>⌕</i></label>
-              <select id="board-sort" aria-label="排序方式">
-                <option value="score">按综合评分</option>
-                <option value="reviews">按评价数量</option>
-                <option value="name">按公司名称</option>
-              </select>
-            </div>
-          </div>
-          <div id="board-results" class="company-list" aria-live="polite"></div>
+          ${redCompanies.length
+            ? `<div class="company-list">${redCompanies.map((company, index) => companyCard(company, index + 1)).join("")}</div>`
+            : `<div class="empty-state"><span>—</span><h3>红榜暂时为空。</h3><p>等第一份足够具体的评价。</p></div>`}
         </section>
 
-        <section class="section latest-section wrap">
-          <div class="section-head section-head--compact">
+        <section class="section list-section list-section--black wrap" id="black">
+          <div class="section-head">
             <div>
-              <p class="eyebrow">02 / LATEST VOICES</p>
-              <h2 class="section-title section-title--small">最近的声音</h2>
+              <p class="eyebrow">BLACK LIST / ${pad(blackCompanies.length)} COMPANIES</p>
+              <h2>黑榜<span>。</span></h2>
             </div>
-            <p class="section-aside section-aside--inline">匿名，但不匿名理由。</p>
+            <p class="section-aside">综合评分 ≤ 2.5 的公司。点开卡片，查看完整好评与差评原文。</p>
           </div>
-          <div class="latest-grid">
-            ${visibleReviews.slice().sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 4).map(reviewCardCompact).join("")}
-          </div>
-        </section>
-
-        <section class="method-band">
-          <div class="wrap method-band-inner">
-            <div>
-              <p class="eyebrow">03 / HOW IT WORKS</p>
-              <h2>不是投票，<br><em>是可追溯的经验。</em></h2>
-            </div>
-            <div class="method-steps">
-              <div><span>01</span><strong>三项评分</strong><p>薪资待遇、工作氛围、个人收获，各 1–5 分。</p></div>
-              <div><span>02</span><strong>必须写理由</strong><p>没有理由的高分或低分，不入榜。</p></div>
-              <div><span>03</span><strong>审核后发布</strong><p>通过 GitHub Issue 提交，编辑核对后写入榜单。</p></div>
-            </div>
-          </div>
-        </section>
-
-        <section class="section submit-strip wrap">
-          <div>
-            <p class="eyebrow">YOUR TURN</p>
-            <h2>你待过的地方，<br><em>值得被下一个人看见。</em></h2>
-          </div>
-          <div>
-            <p>不需要实名，也不要求完美措辞。把薪资、氛围、成长分开打分，写清楚你的角色和时间范围。</p>
-            <a class="button button--red" href="#/submit">写一条评价 <span>↗</span></a>
-          </div>
+          ${blackCompanies.length
+            ? `<div class="company-list">${blackCompanies.map((company, index) => companyCard(company, index + 1)).join("")}</div>`
+            : `<div class="empty-state"><span>—</span><h3>黑榜暂时为空。</h3><p>没有足够证据，就不轻易下判断。</p></div>`}
         </section>
       </div>`;
   }
@@ -673,7 +615,6 @@ ${value("link") || "（未填写）"}
     if (route.name === "home") {
       main.innerHTML = renderHome();
       state.tab = "all";
-      bindBoard();
     } else if (route.name === "companies") {
       main.innerHTML = renderCompanies();
       setActiveNav("companies");
