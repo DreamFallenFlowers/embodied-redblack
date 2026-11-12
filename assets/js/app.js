@@ -152,8 +152,20 @@
           </div>
         </section>
 
-        ${demoBanner()}
+        <section class="home-search wrap" role="search" aria-label="搜索公司">
+          <div class="home-search-box">
+            <span class="home-search-label">SEARCH / COMPANY</span>
+            <div class="home-search-field">
+              <i aria-hidden="true">⌕</i>
+              <input id="home-search-input" type="search" placeholder="搜索公司、城市或方向" autocomplete="off" aria-label="搜索公司、城市或方向">
+              <span id="home-search-count" aria-live="polite"></span>
+            </div>
+          </div>
+        </section>
 
+        <section class="section wrap search-results" id="home-search-results" hidden></section>
+
+        <div id="ranked-lists">
         <section class="section list-section list-section--red wrap" id="red">
           <div class="section-head">
             <div>
@@ -179,6 +191,7 @@
             ? `<div class="company-list">${blackCompanies.map((company, index) => companyCard(company, index + 1)).join("")}</div>`
             : `<div class="empty-state"><span>—</span><h3>黑榜暂时为空。</h3><p>没有足够证据，就不轻易下判断。</p></div>`}
         </section>
+        </div>
       </div>`;
   }
 
@@ -614,7 +627,7 @@ ${value("link") || "（未填写）"}
     closeMenu();
     if (route.name === "home") {
       main.innerHTML = renderHome();
-      state.tab = "all";
+      bindHomeSearch();
     } else if (route.name === "companies") {
       main.innerHTML = renderCompanies();
       setActiveNav("companies");
@@ -631,6 +644,41 @@ ${value("link") || "（未填写）"}
       main.innerHTML = renderNotFound();
     }
     window.scrollTo(0, 0);
+  }
+
+  function bindHomeSearch() {
+    const input = document.getElementById("home-search-input");
+    const results = document.getElementById("home-search-results");
+    const lists = document.getElementById("ranked-lists");
+    const count = document.getElementById("home-search-count");
+    if (!input || !results || !lists) return;
+    input.addEventListener("input", () => {
+      const query = input.value.trim().toLowerCase();
+      if (!query) {
+        results.hidden = true;
+        lists.hidden = false;
+        if (count) count.textContent = "";
+        return;
+      }
+      const matches = companies.filter(company =>
+        [company.name, company.en, company.sector, company.city, ...(company.tags || [])]
+          .join(" ").toLowerCase().includes(query)
+      );
+      lists.hidden = true;
+      results.hidden = false;
+      if (count) count.textContent = `${matches.length} 家`;
+      results.innerHTML = `
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">SEARCH / ${pad(matches.length)} RESULTS</p>
+            <h2>搜索结果</h2>
+          </div>
+          <p class="section-aside">点击公司卡片查看已有评价，或直接写下你的经历。</p>
+        </div>
+        ${matches.length
+          ? `<div class="company-index-grid search-index-grid">${matches.map(companyIndexCard).join("")}</div>`
+          : `<div class="empty-state"><span>∅</span><h3>没有找到这家公司。</h3><p>可以直接在提交页填写公司名称。</p><a class="button button--ghost" href="#/submit">提交评价 ↗</a></div>`}`;
+    });
   }
 
   function bindBoard() {
