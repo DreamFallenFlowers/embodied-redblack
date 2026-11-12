@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<style>
+  :root { --bg:#12100e; --ink:#f2eadc; --muted:#a79b8b; --red:#e34b3f; --gold:#d4a45e; --line:rgba(242,234,220,.15); --serif:"Songti SC","STSong","Noto Serif SC",Georgia,serif; --sans:"PingFang SC","Microsoft YaHei",sans-serif; --mono:Consolas,monospace; }
+  * { box-sizing:border-box; }
+  body { width:1200px; height:630px; margin:0; overflow:hidden; background:var(--bg); color:var(--ink); font-family:var(--sans); }
+  .grid { position:absolute; inset:0; background-image:linear-gradient(to right,rgba(242,234,220,.055) 1px,transparent 1px),linear-gradient(to bottom,rgba(242,234,220,.04) 1px,transparent 1px); background-size:58px 58px; mask-image:linear-gradient(120deg,#000,transparent 72%); }
+  .glow { position:absolute; width:750px; height:520px; right:-160px; top:-140px; background:radial-gradient(ellipse,rgba(227,75,63,.27),transparent 66%); }
+  .frame { position:relative; height:100%; padding:40px 52px 32px; display:flex; flex-direction:column; }
+  .top { display:flex; justify-content:space-between; align-items:center; padding-bottom:19px; border-bottom:1px solid var(--line); }
+  .brand { display:flex; gap:12px; align-items:center; }
+  .mark { display:flex; width:38px; height:38px; font-family:var(--serif); font-weight:700; font-size:13px; }
+  .mark b,.mark i { display:grid; place-items:center; flex:1; font-style:normal; }
+  .mark b { background:var(--red); color:#150f0c; }
+  .mark i { border:1px solid var(--line); border-left:0; color:var(--ink); }
+  .brand strong { display:block; font-family:var(--serif); font-size:17px; letter-spacing:.03em; }
+  .brand small { display:block; margin-top:3px; color:var(--muted); font-family:var(--mono); font-size:7px; letter-spacing:.18em; }
+  .top-meta { color:var(--muted); font-family:var(--mono); font-size:8px; letter-spacing:.1em; line-height:1.8; text-align:right; }
+  .main { flex:1; display:grid; grid-template-columns:1.2fr .8fr; gap:62px; align-items:center; }
+  .kicker { display:flex; align-items:center; gap:8px; color:var(--muted); font-family:var(--mono); font-size:8px; letter-spacing:.08em; }
+  .kicker i { width:6px; height:6px; border-radius:50%; background:var(--red); }
+  h1 { margin:21px 0 0; font-family:var(--serif); font-size:103px; line-height:.79; letter-spacing:-.075em; font-weight:500; }
+  h1 em { display:block; color:var(--red); font-style:normal; }
+  .lede { margin:24px 0 0; max-width:500px; color:#bcb0a1; font-size:13px; line-height:1.85; }
+  .stats { display:flex; gap:31px; margin-top:25px; }
+  .stats strong { display:block; font-family:var(--serif); font-size:28px; line-height:1; font-weight:500; }
+  .stats span { display:block; margin-top:5px; color:var(--muted); font-family:var(--mono); font-size:6.5px; letter-spacing:.06em; }
+  .board { border:1px solid var(--line); background:rgba(27,23,19,.8); padding:17px; }
+  .board-top { display:flex; justify-content:space-between; padding-bottom:14px; border-bottom:1px solid var(--line); color:var(--muted); font-family:var(--mono); font-size:7px; letter-spacing:.08em; }
+  .board-top b { color:#79ae88; font-weight:400; }
+  .split { display:grid; grid-template-columns:1fr 1fr; border:1px solid var(--line); margin-top:16px; }
+  .half { min-height:120px; padding:12px; display:flex; flex-direction:column; justify-content:space-between; }
+  .half + .half { border-left:1px solid var(--line); }
+  .half.red { background:rgba(227,75,63,.12); }
+  .half span { color:var(--muted); font-family:var(--mono); font-size:6.5px; letter-spacing:.08em; }
+  .half strong { font-family:var(--serif); font-size:45px; line-height:.85; font-weight:500; }
+  .half.red strong { color:var(--red); }
+  .half small { color:var(--muted); font-family:var(--mono); font-size:6px; }
+  .foot { display:flex; justify-content:space-between; border-top:1px solid var(--line); padding-top:12px; color:var(--muted); font-family:var(--mono); font-size:7px; letter-spacing:.06em; }
+</style>
+</head>
+<body>
+  <div class="grid"></div><div class="glow"></div>
+  <div class="frame">
+    <div class="top">
+      <div class="brand"><span class="mark"><b>红</b><i>黑</i></span><div><strong>具身红黑榜</strong><small>EMBODIED RANK / ANONYMOUS REVIEWS</small></div></div>
+      <div class="top-meta">匿 名 经 验 / 公 开 讨 论<br>OPEN NOTEBOOK / 2026</div>
+    </div>
+    <div class="main">
+      <div>
+        <div class="kicker"><i></i>ANONYMOUS EXPERIENCE / PUBLIC REASONING</div>
+        <h1>具身<em>红黑榜</em></h1>
+        <p class="lede">薪资待遇、工作氛围、个人收获，三项 5 分制。<br>好评与差评，都必须给出理由。</p>
+        <div class="stats">
+          <div><strong>24</strong><span>收录公司</span></div>
+          <div><strong>07</strong><span>有效评价</span></div>
+          <div><strong>3.1</strong><span>综合均分</span></div>
+        </div>
+      </div>
+      <div class="board">
+        <div class="board-top"><span>LIVE BOARD / 2026</span><b>● UPDATED</b></div>
+        <div class="split">
+          <div class="half red"><span>RED LIST</span><strong>01</strong><small>综合 ≥ 4.0</small></div>
+          <div class="half"><span>BLACK LIST</span><strong>01</strong><small>综合 ≤ 2.5</small></div>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><span>薪资 · 氛围 · 成长 / 三项等权</span><span>不替公司下结论，只把真实经历摆上桌。</span></div>
+  </div>
+</body>
+</html>
