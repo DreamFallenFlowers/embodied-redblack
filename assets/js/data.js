@@ -1,358 +1,260 @@
 window.RB_DATA = (() => {
   const companies = [
-  {
-    "id": "unitree",
-    "name": "宇树科技",
-    "en": "Unitree Robotics",
-    "sector": "四足 / 人形机器人",
-    "city": "杭州",
-    "stage": "成长期",
-    "tags": [
-      "四足",
-      "人形",
-      "运动控制"
-    ],
-    "website": "https://www.unitree.com/",
-    "description": "四足机器人与通用人形机器人公司，公开产品覆盖消费级与行业级平台。",
-    "demo": false
-  },
-  {
-    "id": "agibot",
-    "name": "智元机器人",
-    "en": "AgiBot",
-    "sector": "人形机器人 / 具身模型",
-    "city": "上海",
-    "stage": "成长期",
-    "tags": [
-      "人形",
-      "具身模型",
-      "数据"
-    ],
-    "website": "https://agibot.com/",
-    "description": "面向通用具身智能的人形机器人与基础模型公司。",
-    "demo": false
-  },
-  {
-    "id": "galbot",
-    "name": "银河通用",
-    "en": "Galbot",
-    "sector": "具身智能",
-    "city": "北京",
-    "stage": "成长期",
-    "tags": [
-      "零售",
-      "抓取",
-      "具身模型"
-    ],
-    "website": "https://www.galbot.com/",
-    "description": "面向零售与开放场景的具身智能机器人公司。",
-    "demo": false
-  },
-  {
-    "id": "fourier",
-    "name": "傅利叶智能",
-    "en": "Fourier Intelligence",
-    "sector": "康复 / 人形机器人",
-    "city": "上海",
-    "stage": "成长期",
-    "tags": [
-      "康复",
-      "人形",
-      "硬件"
-    ],
-    "website": "https://www.fftai.com/",
-    "description": "康复机器人与通用人形机器人公司，产品覆盖医疗与通用具身场景。",
-    "demo": false
-  },
-  {
-    "id": "ubtech",
-    "name": "优必选",
-    "en": "UBTech",
-    "sector": "人形机器人",
-    "city": "深圳",
-    "stage": "上市公司",
-    "tags": [
-      "人形",
-      "教育",
-      "服务"
-    ],
-    "website": "https://www.ubtrobot.com/",
-    "description": "人形机器人与智能服务机器人公司，覆盖教育、物流与工业场景。",
-    "demo": false
-  },
-  {
-    "id": "limx",
-    "name": "逐际动力",
-    "en": "LimX Dynamics",
-    "sector": "足式 / 人形机器人",
-    "city": "深圳",
-    "stage": "成长期",
-    "tags": [
-      "足式",
-      "人形",
-      "运动智能"
-    ],
-    "website": "https://www.limxdynamics.com/",
-    "description": "足式机器人与通用人形机器人公司，关注运动智能与真实场景落地。",
-    "demo": false
-  },
-  {
-    "id": "robot-era",
-    "name": "星动纪元",
-    "en": "Robot Era",
-    "sector": "人形机器人",
-    "city": "北京",
-    "stage": "成长期",
-    "tags": [
-      "人形",
-      "全身控制",
-      "具身模型"
-    ],
-    "website": "https://www.robotera.com/",
-    "description": "人形机器人与具身智能公司，公开产品包括双足人形平台。",
-    "demo": false
-  },
-  {
-    "id": "galaxea",
-    "name": "星海图",
-    "en": "Galaxea AI",
-    "sector": "具身模型 / 机器人",
-    "city": "北京",
-    "stage": "成长期",
-    "tags": [
-      "具身模型",
-      "数据",
-      "本体"
-    ],
-    "website": "https://www.galaxea-ai.com/",
-    "description": "具身智能模型与机器人本体公司，强调数据与真实世界泛化。",
-    "demo": false
-  },
-  {
-    "id": "xsquare",
-    "name": "自变量机器人",
-    "en": "X Square Robot",
-    "sector": "具身模型",
-    "city": "深圳",
-    "stage": "成长期",
-    "tags": [
-      "端到端",
-      "具身模型",
-      "操作"
-    ],
-    "website": "",
-    "description": "面向通用操作的端到端具身智能模型与机器人公司。",
-    "demo": false
-  },
-  {
-    "id": "engineai",
-    "name": "众擎机器人",
-    "en": "EngineAI",
-    "sector": "人形机器人",
-    "city": "深圳",
-    "stage": "成长期",
-    "tags": [
-      "人形",
-      "双足",
-      "硬件"
-    ],
-    "website": "https://www.engineai.com.cn/",
-    "description": "人形机器人公司，公开产品覆盖双足人形平台。",
-    "demo": false
-  },
-  {
-    "id": "deep-robotics",
-    "name": "云深处科技",
-    "en": "Deep Robotics",
-    "sector": "四足机器人 / 行业",
-    "city": "杭州",
-    "stage": "成长期",
-    "tags": [
-      "四足",
-      "巡检",
-      "行业落地"
-    ],
-    "website": "https://www.deeprobotics.cn/",
-    "description": "四足机器人与行业巡检解决方案公司。",
-    "demo": false
-  },
-  {
-    "id": "figure",
-    "name": "Figure AI",
-    "en": "Figure",
-    "sector": "人形机器人",
-    "city": "美国",
-    "stage": "成长期",
-    "tags": [
-      "人形",
-      "物流",
-      "制造"
-    ],
-    "website": "https://www.figure.ai/",
-    "description": "美国人形机器人公司，面向物流、制造与家庭等场景。",
-    "demo": false
-  },
-  {
-    "id": "1x",
-    "name": "1X Technologies",
-    "en": "1X",
-    "sector": "人形机器人",
-    "city": "挪威 / 美国",
-    "stage": "成长期",
-    "tags": [
-      "人形",
-      "家庭",
-      "安全"
-    ],
-    "website": "https://www.1x.tech/",
-    "description": "挪威与美国的人形机器人公司，关注家庭与日常场景。",
-    "demo": false
-  },
-  {
-    "id": "physical-intelligence",
-    "name": "Physical Intelligence",
-    "en": "Physical Intelligence",
-    "sector": "具身模型",
-    "city": "美国",
-    "stage": "成长期",
-    "tags": [
-      "VLA",
-      "基础模型",
-      "操作"
-    ],
-    "website": "https://www.physicalintelligence.company/",
-    "description": "美国具身智能基础模型公司，研究通用机器人策略。",
-    "demo": false
-  },
-  {
-    "id": "apptronik",
-    "name": "Apptronik",
-    "en": "Apptronik",
-    "sector": "人形机器人",
-    "city": "美国",
-    "stage": "成长期",
-    "tags": [
-      "人形",
-      "工业",
-      "物流"
-    ],
-    "website": "https://apptronik.com/",
-    "description": "美国人形机器人公司，面向工业与物流场景。",
-    "demo": false
-  },
-  {
-    "id": "boston-dynamics",
-    "name": "Boston Dynamics",
-    "en": "Boston Dynamics",
-    "sector": "足式 / 人形机器人",
-    "city": "美国",
-    "stage": "成熟期",
-    "tags": [
-      "四足",
-      "人形",
-      "运动控制"
-    ],
-    "website": "https://bostondynamics.com/",
-    "description": "美国足式与人形机器人公司，公开产品包括 Spot 与 Atlas。",
-    "demo": false
-  },
-  {
-    "id": "tesla-optimus",
-    "name": "Tesla Optimus",
-    "en": "Tesla",
-    "sector": "人形机器人",
-    "city": "美国",
-    "stage": "成长期",
-    "tags": [
-      "人形",
-      "制造",
-      "量产"
-    ],
-    "website": "https://www.tesla.com/AI",
-    "description": "Tesla 的人形机器人项目，目标是通用、可规模化制造的人形机器人。",
-    "demo": false
-  },
-  {
-    "id": "flexiv",
-    "name": "非夕科技",
-    "en": "Flexiv",
-    "sector": "协作机器人",
-    "city": "上海",
-    "stage": "成长期",
-    "tags": [
-      "力控",
-      "协作臂",
-      "工业"
-    ],
-    "website": "https://www.flexiv.com/",
-    "description": "自适应协作机器人与力控机械臂公司，面向工业与服务场景。",
-    "demo": false
-  },
-  {
-    "id": "jaka",
-    "name": "节卡机器人",
-    "en": "JAKA",
-    "sector": "协作机器人",
-    "city": "上海",
-    "stage": "成长期",
-    "tags": [
-      "协作臂",
-      "工业",
-      "易用性"
-    ],
-    "website": "https://www.jaka.com/",
-    "description": "协作机器人公司，产品覆盖工业、商业与服务场景。",
-    "demo": false
-  },
-  {
-    "id": "dobot",
-    "name": "越疆科技",
-    "en": "Dobot",
-    "sector": "协作机器人",
-    "city": "深圳",
-    "stage": "上市公司",
-    "tags": [
-      "协作臂",
-      "桌面",
-      "教育"
-    ],
-    "website": "https://www.dobot-robots.com/",
-    "description": "协作机器人与桌面机械臂公司，覆盖教育、工业与商业场景。",
-    "demo": false
-  },
-  {
-    "id": "rokae",
-    "name": "珞石机器人",
-    "en": "Rokae",
-    "sector": "协作机器人",
-    "city": "北京",
-    "stage": "成长期",
-    "tags": [
-      "协作臂",
-      "工业",
-      "力控"
-    ],
-    "website": "https://www.rokae.com/",
-    "description": "协作机器人与工业机器人公司，强调力控与柔性制造。",
-    "demo": false
-  }
-];
-  const reviews = [
-  {
-    "id": "issue-2",
-    "companyId": "unitree",
-    "type": "good",
-    "salary": 4,
-    "atmosphere": 5,
-    "growth": 4,
-    "reason": "自动发布端到端测试：用于确认 Issue 打开后可以自动写入数据并部署，测试结束后会撤回。",
-    "role": "测试岗位",
-    "tenure": "1–2 年",
-    "location": "杭州",
-    "date": "2026-11-12",
-    "author": "匿名",
-    "source": "github-issue"
-  }
-];
-  return { companies, reviews, updated: "2026.11" };
+    {
+      id: "unitree",
+      name: "宇树科技",
+      en: "Unitree Robotics",
+      sector: "四足 / 人形机器人",
+      city: "杭州",
+      stage: "成长期",
+      tags: ["四足", "人形", "运动控制"],
+      website: "https://www.unitree.com/",
+      description: "四足机器人与通用人形机器人公司，公开产品覆盖消费级与行业级平台。",
+      demo: false
+    },
+    {
+      id: "agibot",
+      name: "智元机器人",
+      en: "AgiBot",
+      sector: "人形机器人 / 具身模型",
+      city: "上海",
+      stage: "成长期",
+      tags: ["人形", "具身模型", "数据"],
+      website: "https://agibot.com/",
+      description: "面向通用具身智能的人形机器人与基础模型公司。",
+      demo: false
+    },
+    {
+      id: "galbot",
+      name: "银河通用",
+      en: "Galbot",
+      sector: "具身智能",
+      city: "北京",
+      stage: "成长期",
+      tags: ["零售", "抓取", "具身模型"],
+      website: "https://www.galbot.com/",
+      description: "面向零售与开放场景的具身智能机器人公司。",
+      demo: false
+    },
+    {
+      id: "fourier",
+      name: "傅利叶智能",
+      en: "Fourier Intelligence",
+      sector: "康复 / 人形机器人",
+      city: "上海",
+      stage: "成长期",
+      tags: ["康复", "人形", "硬件"],
+      website: "https://www.fftai.com/",
+      description: "康复机器人与通用人形机器人公司，产品覆盖医疗与通用具身场景。",
+      demo: false
+    },
+    {
+      id: "ubtech",
+      name: "优必选",
+      en: "UBTech",
+      sector: "人形机器人",
+      city: "深圳",
+      stage: "上市公司",
+      tags: ["人形", "教育", "服务"],
+      website: "https://www.ubtrobot.com/",
+      description: "人形机器人与智能服务机器人公司，覆盖教育、物流与工业场景。",
+      demo: false
+    },
+    {
+      id: "limx",
+      name: "逐际动力",
+      en: "LimX Dynamics",
+      sector: "足式 / 人形机器人",
+      city: "深圳",
+      stage: "成长期",
+      tags: ["足式", "人形", "运动智能"],
+      website: "https://www.limxdynamics.com/",
+      description: "足式机器人与通用人形机器人公司，关注运动智能与真实场景落地。",
+      demo: false
+    },
+    {
+      id: "robot-era",
+      name: "星动纪元",
+      en: "Robot Era",
+      sector: "人形机器人",
+      city: "北京",
+      stage: "成长期",
+      tags: ["人形", "全身控制", "具身模型"],
+      website: "https://www.robotera.com/",
+      description: "人形机器人与具身智能公司，公开产品包括双足人形平台。",
+      demo: false
+    },
+    {
+      id: "galaxea",
+      name: "星海图",
+      en: "Galaxea AI",
+      sector: "具身模型 / 机器人",
+      city: "北京",
+      stage: "成长期",
+      tags: ["具身模型", "数据", "本体"],
+      website: "https://www.galaxea-ai.com/",
+      description: "具身智能模型与机器人本体公司，强调数据与真实世界泛化。",
+      demo: false
+    },
+    {
+      id: "xsquare",
+      name: "自变量机器人",
+      en: "X Square Robot",
+      sector: "具身模型",
+      city: "深圳",
+      stage: "成长期",
+      tags: ["端到端", "具身模型", "操作"],
+      website: "",
+      description: "面向通用操作的端到端具身智能模型与机器人公司。",
+      demo: false
+    },
+    {
+      id: "engineai",
+      name: "众擎机器人",
+      en: "EngineAI",
+      sector: "人形机器人",
+      city: "深圳",
+      stage: "成长期",
+      tags: ["人形", "双足", "硬件"],
+      website: "https://www.engineai.com.cn/",
+      description: "人形机器人公司，公开产品覆盖双足人形平台。",
+      demo: false
+    },
+    {
+      id: "deep-robotics",
+      name: "云深处科技",
+      en: "Deep Robotics",
+      sector: "四足机器人 / 行业",
+      city: "杭州",
+      stage: "成长期",
+      tags: ["四足", "巡检", "行业落地"],
+      website: "https://www.deeprobotics.cn/",
+      description: "四足机器人与行业巡检解决方案公司。",
+      demo: false
+    },
+    {
+      id: "figure",
+      name: "Figure AI",
+      en: "Figure",
+      sector: "人形机器人",
+      city: "美国",
+      stage: "成长期",
+      tags: ["人形", "物流", "制造"],
+      website: "https://www.figure.ai/",
+      description: "美国人形机器人公司，面向物流、制造与家庭等场景。",
+      demo: false
+    },
+    {
+      id: "1x",
+      name: "1X Technologies",
+      en: "1X",
+      sector: "人形机器人",
+      city: "挪威 / 美国",
+      stage: "成长期",
+      tags: ["人形", "家庭", "安全"],
+      website: "https://www.1x.tech/",
+      description: "挪威与美国的人形机器人公司，关注家庭与日常场景。",
+      demo: false
+    },
+    {
+      id: "physical-intelligence",
+      name: "Physical Intelligence",
+      en: "Physical Intelligence",
+      sector: "具身模型",
+      city: "美国",
+      stage: "成长期",
+      tags: ["VLA", "基础模型", "操作"],
+      website: "https://www.physicalintelligence.company/",
+      description: "美国具身智能基础模型公司，研究通用机器人策略。",
+      demo: false
+    },
+    {
+      id: "apptronik",
+      name: "Apptronik",
+      en: "Apptronik",
+      sector: "人形机器人",
+      city: "美国",
+      stage: "成长期",
+      tags: ["人形", "工业", "物流"],
+      website: "https://apptronik.com/",
+      description: "美国人形机器人公司，面向工业与物流场景。",
+      demo: false
+    },
+    {
+      id: "boston-dynamics",
+      name: "Boston Dynamics",
+      en: "Boston Dynamics",
+      sector: "足式 / 人形机器人",
+      city: "美国",
+      stage: "成熟期",
+      tags: ["四足", "人形", "运动控制"],
+      website: "https://bostondynamics.com/",
+      description: "美国足式与人形机器人公司，公开产品包括 Spot 与 Atlas。",
+      demo: false
+    },
+    {
+      id: "tesla-optimus",
+      name: "Tesla Optimus",
+      en: "Tesla",
+      sector: "人形机器人",
+      city: "美国",
+      stage: "成长期",
+      tags: ["人形", "制造", "量产"],
+      website: "https://www.tesla.com/AI",
+      description: "Tesla 的人形机器人项目，目标是通用、可规模化制造的人形机器人。",
+      demo: false
+    },
+    {
+      id: "flexiv",
+      name: "非夕科技",
+      en: "Flexiv",
+      sector: "协作机器人",
+      city: "上海",
+      stage: "成长期",
+      tags: ["力控", "协作臂", "工业"],
+      website: "https://www.flexiv.com/",
+      description: "自适应协作机器人与力控机械臂公司，面向工业与服务场景。",
+      demo: false
+    },
+    {
+      id: "jaka",
+      name: "节卡机器人",
+      en: "JAKA",
+      sector: "协作机器人",
+      city: "上海",
+      stage: "成长期",
+      tags: ["协作臂", "工业", "易用性"],
+      website: "https://www.jaka.com/",
+      description: "协作机器人公司，产品覆盖工业、商业与服务场景。",
+      demo: false
+    },
+    {
+      id: "dobot",
+      name: "越疆科技",
+      en: "Dobot",
+      sector: "协作机器人",
+      city: "深圳",
+      stage: "上市公司",
+      tags: ["协作臂", "桌面", "教育"],
+      website: "https://www.dobot-robots.com/",
+      description: "协作机器人与桌面机械臂公司，覆盖教育、工业与商业场景。",
+      demo: false
+    },
+    {
+      id: "rokae",
+      name: "珞石机器人",
+      en: "Rokae",
+      sector: "协作机器人",
+      city: "北京",
+      stage: "成长期",
+      tags: ["协作臂", "工业", "力控"],
+      website: "https://www.rokae.com/",
+      description: "协作机器人与工业机器人公司，强调力控与柔性制造。",
+      demo: false
+    }
+  ];
+
+  const reviews = [];
+
+  return { companies, reviews, updated: "2026-11-12" };
 })();
