@@ -125,7 +125,6 @@
     return `<div class="demo-banner wrap">
       <span class="demo-mark">DEMO</span>
       <p>当前包含 ${demoCount} 家虚构示例公司与演示评价，仅用于展示、测试页面，不代表任何真实雇主。真实公司评价从零开始收集。</p>
-      <a href="#/about">查看规则 ↗</a>
     </div>`;
   }
 
@@ -145,7 +144,6 @@
             <p class="hero-lede">薪资待遇、工作氛围、个人收获，三项 5 分制。<br>好评与差评都必须给出理由。这里不替公司下结论，只把真实经历摆上桌。</p>
             <div class="hero-actions">
               <a class="button button--red" href="#/submit">提交一条评价 <span>↗</span></a>
-              <a class="button button--ghost" href="#/about">先看评价规则</a>
             </div>
             <p class="hero-note">匿名投稿 · 社区审核 · 不收录人身攻击与未公开信息</p>
           </div>
@@ -226,7 +224,6 @@
               <div><span>02</span><strong>必须写理由</strong><p>没有理由的高分或低分，不入榜。</p></div>
               <div><span>03</span><strong>审核后发布</strong><p>通过 GitHub Issue 提交，编辑核对后写入榜单。</p></div>
             </div>
-            <a class="button button--ghost" href="#/about">阅读完整规则 <span>↗</span></a>
           </div>
         </section>
 
@@ -455,28 +452,26 @@
   /* -------------------------------------------------------------- submit */
 
   function renderSubmit() {
-    const selectedCompany = new URLSearchParams((window.location.hash.split("?")[1] || "")).get("company") || "";
+    const selectedId = new URLSearchParams((window.location.hash.split("?")[1] || "")).get("company") || "";
+    const selected = companyById.get(selectedId);
+    const selectedName = selected ? selected.name : "";
     const real = allRealCompanies();
     return `<div class="view submit-view">
       <section class="page-head wrap">
         <p class="eyebrow"><span class="eyebrow-dot"></span>ANONYMOUS REVIEW / SUBMIT</p>
         <h1>写下你的<br><em>真实体感。</em></h1>
-        <p class="page-lede">不需要实名，但需要具体。把薪资、氛围、成长分开打分，写清楚你的岗位、任期和判断依据。</p>
       </section>
       <section class="section wrap submit-layout">
         <form class="review-form" id="review-form" novalidate>
           <div class="form-section">
             <div class="form-section-head"><span>01</span><h2>评价对象</h2></div>
             <div class="field-grid">
-              <label class="field field--wide"><span>公司 <em>*</em></span>
-                <select name="company" id="review-company" required>
-                  <option value="">选择一家公司</option>
-                  ${real.map(company => `<option value="${esc(company.id)}" ${company.id === selectedCompany ? "selected" : ""}>${esc(company.name)} · ${esc(company.sector)}</option>`).join("")}
-                  <option value="__new">其他 / 建议新增公司</option>
-                </select>
+              <label class="field field--wide"><span>公司名称 <em>*</em></span>
+                <input name="companyName" id="review-company" list="company-options" maxlength="100" required autocomplete="organization" placeholder="直接输入公司全称，或从建议中选择" value="${esc(selectedName)}">
+                <datalist id="company-options">${real.map(company => `<option value="${esc(company.name)}"></option>`).join("")}</datalist>
               </label>
-              <label class="field field--wide is-hidden" id="new-company-field"><span>公司名称 <em>*</em></span><input type="text" name="newCompany" maxlength="80" placeholder="请填写公司全称"></label>
             </div>
+            <p class="form-hint">公司名可以直接填写；输入时会显示公司库中的建议。</p>
             <div class="field-grid field-grid--three">
               <label class="field"><span>评价类型 <em>*</em></span>
                 <select name="type" required>
@@ -543,31 +538,6 @@
             <p class="form-status" id="review-status">${REPO ? "提交后会在 GitHub 打开审核 Issue。" : "当前未配置仓库，提交会复制草稿。"}</p>
           </div>
         </form>
-        <aside class="submit-aside">
-          <div class="aside-block">
-            <span class="eyebrow">BEFORE YOU WRITE</span>
-            <h3>写之前，<br>先确认三件事。</h3>
-            <ol>
-              <li>你评价的是自己的经历，不是听来的传闻。</li>
-              <li>你愿意让下一个人看到具体依据，而不只是情绪。</li>
-              <li>你没有泄露他人隐私、客户信息或未公开项目。</li>
-            </ol>
-          </div>
-          <div class="aside-block aside-block--red">
-            <span class="eyebrow">NOT ALLOWED</span>
-            <h3>以下内容会被删除。</h3>
-            <ul>
-              <li>人身攻击、侮辱、歧视或未经证实的指控</li>
-              <li>真实姓名、联系方式、工号等个人信息</li>
-              <li>未公开的薪酬表、客户名单或商业秘密</li>
-            </ul>
-          </div>
-          <div class="aside-block">
-            <span class="eyebrow">AFTER SUBMIT</span>
-            <p>评价会进入公开审核队列。编辑核对格式与边界后，写入 <code>data.js</code> 并重新发布；公司也可以提交事实性回应。</p>
-            <a href="#/about">完整评价规则 ↗</a>
-          </div>
-        </aside>
       </section>
     </div>`;
   }
@@ -584,11 +554,9 @@
   function buildReviewDraft(form) {
     const data = new FormData(form);
     const value = key => String(data.get(key) || "").trim();
-    const companyId = value("company");
-    const company = companyId === "__new" ? null : companyById.get(companyId);
     const type = typeMeta(value("type")).label;
     return `### 评价对象
-${company ? company.name : value("newCompany") || "待确认"}
+${value("companyName") || "待确认"}
 
 ### 评价类型
 ${type}
@@ -620,13 +588,6 @@ ${value("link") || "（未填写）"}
   function setupSubmit() {
     const form = document.getElementById("review-form");
     if (!form) return;
-    const companySelect = document.getElementById("review-company");
-    const newCompanyField = document.getElementById("new-company-field");
-    companySelect?.addEventListener("change", () => {
-      newCompanyField?.classList.toggle("is-hidden", companySelect.value !== "__new");
-      const newInput = form.querySelector('[name="newCompany"]');
-      if (newInput) newInput.required = companySelect.value === "__new";
-    });
     form.querySelector("[data-copy-review]")?.addEventListener("click", () => {
       if (!form.reportValidity()) return;
       copyText(buildReviewDraft(form), "评价草稿已复制");
@@ -635,10 +596,9 @@ ${value("link") || "（未填写）"}
       event.preventDefault();
       if (!form.reportValidity()) return;
       const draft = buildReviewDraft(form);
-      const companyId = form.querySelector('[name="company"]').value;
-      const company = companyId === "__new" ? null : companyById.get(companyId);
+      const companyName = form.querySelector('[name="companyName"]').value.trim() || "新公司";
       const type = typeMeta(form.querySelector('[name="type"]').value).label;
-      const title = `[评价] ${company ? company.name : "新公司"} / ${type}`;
+      const title = `[评价] ${companyName} / ${type}`;
       const link = issueUrl(title, draft);
       const status = document.getElementById("review-status");
       if (link && !isLocalPreview()) {
@@ -650,68 +610,6 @@ ${value("link") || "（未填写）"}
         if (status) status.textContent = "本地预览：评价草稿已复制。";
       }
     });
-  }
-
-  /* --------------------------------------------------------------- about */
-
-  function renderAbout() {
-    return `<div class="view about-view">
-      <section class="page-head wrap">
-        <p class="eyebrow"><span class="eyebrow-dot"></span>WHY THIS EXISTS / RULES</p>
-        <h1>不是法庭，<br><em>是一张经验地图。</em></h1>
-        <p class="page-lede">具身智能行业变化很快，招聘信息却很少包含真实的组织体验。这里收集匿名、具体、可讨论的评价，让后来者在接受 offer 前多一个参照。</p>
-      </section>
-      <section class="section wrap about-grid">
-        <article class="about-main">
-          <h2>我们为什么做这件事</h2>
-          <p>薪资可以比较，工作氛围和个人收获却常常只在私下流传。信息不对称让求职者只能依赖面试感受，也让认真做事的团队难以被看见。</p>
-          <p>具身红黑榜不试图给公司发奖杯或判决书。它做的是一件更小的事：把「我在那里工作过」拆成三个可比较的维度，并要求每个分数都附带理由。</p>
-
-          <h2>评分怎么算</h2>
-          <div class="rule-table">
-            <div><span>薪资待遇</span><p>现金、期权、福利与投入产出比。不是绝对薪资排名，而是投稿者感受到的公平与可持续性。</p></div>
-            <div><span>工作氛围</span><p>协作、管理、节奏、安全感与沟通质量。允许不同团队之间存在差异，但要求写清具体情境。</p></div>
-            <div><span>个人收获</span><p>技能、视野、项目质量与成长速度。不是「忙不忙」，而是忙完之后得到了什么。</p></div>
-          </div>
-          <p>三项等权平均为综合分。单家公司少于 2 份评价时标记「观察中」；综合 ≥ 4.0 进入红榜，≤ 2.5 进入黑榜。样本不足时，标签只描述现有样本，不构成对公司的整体判断。</p>
-
-          <h2>审核边界</h2>
-          <ul class="about-list">
-            <li><strong>只收第一人称经验。</strong>「听说」「朋友说」不能作为独立评价；可以补充在理由里，但必须有投稿者自己的经历。</li>
-            <li><strong>禁止人身攻击。</strong>可以批评管理方式和制度，但不能点名羞辱、歧视或威胁个人。</li>
-            <li><strong>不泄露隐私与商业秘密。</strong>真实姓名、联系方式、工号、未公开薪酬表、客户名单和 NDA 内容都会被删除。</li>
-            <li><strong>公司可以回应。</strong>如果公司认为某条评价存在事实错误，可以通过 GitHub Issue 提交可核对的事实性回应。</li>
-            <li><strong>编辑会保留修改痕迹。</strong>审核通过的评价写入仓库，修改与撤回都留在 Git 历史里。</li>
-          </ul>
-
-          <h2>数据与匿名性</h2>
-          <p>站点是静态页面。提交表单会生成一个公开 GitHub Issue；编辑审核后，将评价写入 <code>data.js</code> 并重新部署。平台不收集账号、联系方式或浏览行为。</p>
-          <p>匿名不等于无责任。请不要把 GitHub Issue 当作可以随意指控的空间；所有公开内容都可能被公司、同行和后来者看到。</p>
-
-          <h2>免责声明</h2>
-          <p class="about-disclaimer">所有评价仅代表投稿者个人经历与判断，不构成对任何公司的事实认定或法律结论。平台不保证评价真实、完整或最新。读者应自行交叉验证，并把评价放回具体岗位、团队与时间背景中理解。</p>
-          ${DEMO_MODE ? '<div class="demo-callout"><span class="demo-chip">DEMO</span><p>当前榜单中的「示例·北辰」「示例·砺行」「示例·潮汐」及其评价均为虚构内容，仅用于展示页面结构，不代表任何真实公司。</p></div>' : ""}
-        </article>
-        <aside class="about-aside">
-          <div class="aside-block aside-block--red">
-            <span class="eyebrow">QUICK RULES</span>
-            <h3>写评价前</h3>
-            <ul>
-              <li>第一人称经历</li>
-              <li>三项评分 + 具体理由</li>
-              <li>不写真实姓名与联系方式</li>
-              <li>不写未公开信息</li>
-              <li>允许编辑核对与修改</li>
-            </ul>
-          </div>
-          <div class="aside-block">
-            <span class="eyebrow">CONTACT</span>
-            <p>规则建议、公司回应或内容申诉，请通过 GitHub Issues 提交。</p>
-            <a href="${REPO_URL || "#"}/issues" target="_blank" rel="noopener">打开 Issues ↗</a>
-          </div>
-        </aside>
-      </section>
-    </div>`;
   }
 
   function renderNotFound() {
@@ -744,7 +642,6 @@ ${value("link") || "（未填写）"}
     if (!parts.length) return { name: "home" };
     if (parts[0] === "companies") return { name: "companies" };
     if (parts[0] === "submit") return { name: "submit", query };
-    if (parts[0] === "about") return { name: "about" };
     if (parts[0] === "company" && parts[1]) {
       const company = companyById.get(decodeURIComponent(parts[1]));
       return company ? { name: "company", company } : { name: "notfound" };
@@ -769,7 +666,6 @@ ${value("link") || "（未填写）"}
       home: "具身红黑榜 · 具身智能公司匿名评价",
       companies: "公司库 · 具身红黑榜",
       submit: "提交评价 · 具身红黑榜",
-      about: "方法论 · 具身红黑榜",
       notfound: "页面不存在 · 具身红黑榜"
     };
     document.title = route.name === "company" ? `${route.company.name} · 具身红黑榜` : titles[route.name] || titles.notfound;
@@ -790,9 +686,6 @@ ${value("link") || "（未填写）"}
       main.innerHTML = renderSubmit();
       setActiveNav("submit");
       setupSubmit();
-    } else if (route.name === "about") {
-      main.innerHTML = renderAbout();
-      setActiveNav("about");
     } else {
       main.innerHTML = renderNotFound();
     }
