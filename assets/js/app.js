@@ -41,7 +41,7 @@
     const good = list.filter(review => review.type === "good").length;
     const bad = list.filter(review => review.type === "bad").length;
     const neutral = list.filter(review => review.type === "neutral").length;
-    const verdict = !list.length ? "pending" : list.length < 2 ? "watch" : overall >= 4 ? "red" : overall <= 2.5 ? "black" : "watch";
+    const verdict = !list.length ? "pending" : overall >= 4 ? "red" : overall <= 2.5 ? "black" : "watch";
     return { list, count: list.length, salary, atmosphere, growth, overall, good, bad, neutral, verdict };
   }
 
@@ -148,7 +148,7 @@
             <div class="hero-actions">
               <a class="button button--red" href="#/submit">提交一条评价 <span>↗</span></a>
             </div>
-            <p class="hero-note">匿名投稿 · 社区审核 · 不收录人身攻击与未公开信息</p>
+            <p class="hero-note">匿名投稿 · 自动发布 · 事后可更正或撤下</p>
           </div>
         </section>
 
@@ -497,13 +497,13 @@
               <label class="field"><span>展示名称</span><input type="text" name="author" maxlength="40" placeholder="可留空，默认匿名"></label>
               <label class="field"><span>补充链接</span><input type="url" name="link" placeholder="可选：招聘页 / 项目页"></label>
             </div>
-            <label class="check-field"><input type="checkbox" name="consent" required><span>我确认内容是自己的真实经历，不包含人身攻击、隐私、未公开信息或商业秘密；同意在审核通过后公开展示。</span></label>
-            <p class="form-disclaimer">提交会生成一个公开 GitHub Issue，用于审核与留痕。平台不会自动发布，编辑核对后会写入榜单。请不要填写真实姓名、联系方式或可识别他人的信息。</p>
+            <label class="check-field"><input type="checkbox" name="consent" required><span>我确认内容是自己的真实经历，不包含人身攻击、隐私、未公开信息或商业秘密；同意自动公开展示，并允许后续更正或撤下。</span></label>
+            <p class="form-disclaimer">提交会生成一个公开 GitHub Issue，用于留痕与自动发布。Issue 打开后会自动写入榜单；编辑会事后抽查，违规内容可被撤下。请不要填写真实姓名、联系方式或可识别他人的信息。</p>
             <div class="form-actions">
               <button class="button button--ghost" type="button" data-copy-review>复制草稿</button>
               <button class="button button--red" type="submit">提交到 GitHub <span>↗</span></button>
             </div>
-            <p class="form-status" id="review-status">${REPO ? "提交后会在 GitHub 打开审核 Issue。" : "当前未配置仓库，提交会复制草稿。"}</p>
+            <p class="form-status" id="review-status">${REPO ? "提交后会打开 GitHub Issue，自动发布到榜单。" : "当前未配置仓库，提交会复制草稿。"}</p>
           </div>
         </form>
       </section>
