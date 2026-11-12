@@ -29,14 +29,12 @@ create index if not exists reviews_created_at_idx on public.reviews (created_at 
 
 alter table public.reviews enable row level security;
 
-drop policy if exists "公开读取已发布评价" on public.reviews;
 create policy "公开读取已发布评价"
   on public.reviews
   for select
   to anon, authenticated
   using (published = true);
 
-drop policy if exists "匿名提交评价" on public.reviews;
 create policy "匿名提交评价"
   on public.reviews
   for insert
