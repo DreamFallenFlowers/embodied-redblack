@@ -167,6 +167,7 @@
       const remoteCompanies = [];
       const remoteReviews = [];
       rows.forEach(row => {
+        if (String(row.author || "") === "__qa_dryrun__") return;
         const companyName = String(row.company_name || "").trim();
         const type = ["good", "neutral", "bad"].includes(row.type) ? row.type : null;
         const salary = Number(row.salary);
@@ -405,6 +406,11 @@
   /* ----------------------------------------------------------- companies */
 
   function renderCompanies() {
+    const humanoidCompanies = companies.filter(c => !c.demo && /人形|具身/.test(c.sector));
+    const mobileCompanies = companies.filter(c => !c.demo && /四足|足式|移动/.test(c.sector) && !/人形|具身/.test(c.sector));
+    const industrialCompanies = companies.filter(c => !c.demo && /协作|工业/.test(c.sector));
+    const groupedIds = new Set([...humanoidCompanies, ...mobileCompanies, ...industrialCompanies].map(c => c.id));
+    const otherCompanies = companies.filter(c => !c.demo && !groupedIds.has(c.id));
     return `<div class="view companies-view">
       <section class="page-head wrap">
         <p class="eyebrow"><span class="eyebrow-dot"></span>COMPANY INDEX / ALL COMPANIES</p>
@@ -418,9 +424,10 @@
       ${demoBanner()}
       <section class="section wrap">
         <div class="companies-groups">
-          ${groupMarkup("人形与通用具身", companies.filter(c => /人形|具身/.test(c.sector) && !c.demo))}
-          ${groupMarkup("移动与足式", companies.filter(c => /四足|足式|移动/.test(c.sector) && !/人形|具身/.test(c.sector) && !c.demo))}
-          ${groupMarkup("协作与工业", companies.filter(c => /协作|工业/.test(c.sector) && !c.demo))}
+          ${groupMarkup("人形与通用具身", humanoidCompanies)}
+          ${groupMarkup("移动与足式", mobileCompanies)}
+          ${groupMarkup("协作与工业", industrialCompanies)}
+          ${groupMarkup("其他与社区新增", otherCompanies)}
           ${DEMO_MODE ? groupMarkup("演示数据", companies.filter(c => c.demo), true) : ""}
         </div>
       </section>
